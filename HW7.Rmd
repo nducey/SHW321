@@ -1,0 +1,99 @@
+---
+title: "Untitled"
+author: "Nicolas Ducey"
+date: "4/13/2020"
+output: html_document
+---
+
+Load the data and aving it to a data frame
+```{r}
+
+df <- data.frame(read.csv("C:/Users/bubbl/Downloads/ill_school_data.csv"))
+summary(df)
+
+```
+So there are 60 variables, and there are 500 observations. These seem to be school highschooler's answers to a survey about themselves. Looking at the summary we can see that some of the variables have a lot of NA's indicating data. Once you take a look at the actual file you can see there is a lot of missinf data but there is also a lot of incorrect inputs, such as student #7 insistis on ading extra texts such as "mins" and "cm" in purely numericalvariable, meaning that these are probably responses from a survey so there is a lot of errors and misunderstandings that need to be cleaned up.
+
+b)
+Now, using a data set with every observation with a blanck or na in Handed and Favourite season deleted
+
+
+While I have cleaned up the dataset by deleting any observations with missing data for the sake of the excercise, I think this is something that can be done in this situation since we are only dealing with these two variables however it could cause itues if we wanted to use the dataset for other variables since while the information might be missing in these specific variables, in others the observation may provide information andths wouldnt be worth deleing.
+
+```{r}
+
+df1 <- data.frame(read.csv("C:/Users/bubbl/Downloads/ill_school_dataHandedSeason.csv"))
+
+fisher.test( df1$Favorite_Season, df1$Handed)
+```
+I utilized Fishers exact test because the variables were categorical
+With a p-value = 0.6253 at an alpha of 0.05 we cannot reject the null hypothesis and thus cant state that favourite season and handed arent independent
+
+c)
+```{r}
+
+dfalmost2 <- data.frame(read.csv("C:/Users/bubbl/Downloads/ill_school_data Clean for armandhight.csv"))
+
+#A reduced set to make working with mice less taxing
+df2 <- data.frame( Height_cm = dfalmost2$Height_cm,  Armspan_cm = dfalmost2$Armspan_cm)
+
+
+
+library(mice)
+
+set.seed(1234)
+mids<-mice(df2,m=5,method="cart")
+
+fit.mids = with(data=mids, exp = lm(Height_cm ~ Armspan_cm))
+
+
+PooledFit = pool(fit.mids) 
+
+summary(PooledFit)
+
+
+```
+Intercept parameter estimate 103.3830264 and the standard error is 5.97965816 
+
+Armspan_cm parameter estimate 0.3697593 and the standard error is 0.03742069
+
+
+For the random forest:
+```{r}
+set.seed(1234)
+mids<-mice(df2,m=5,method="rf")
+
+fit.mids = with(data=mids, exp = lm(Height_cm ~ Armspan_cm))
+
+PooledFit = pool(fit.mids) 
+
+summary(PooledFit)
+```
+Intercept parameter estimate 104.2631 and the standard error is 5.525433
+
+Armspan_cm parameter estimate 0.3641387 and the standard error is 0.036006
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
